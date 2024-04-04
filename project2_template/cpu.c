@@ -414,6 +414,25 @@ int readFile(const char *filePath) {
     return 0;
 }
 
+void writeMemFile(const char *filePath) {
+
+    // Calculate the number of elements in the array
+    int num_elements = sizeof(cpu.memory) / sizeof(cpu.memory[0]);
+
+    // Open the binary file for writing
+    FILE *file = fopen(filePath, "wb");
+    if (file == NULL) {
+        perror("Error opening file");
+    }
+
+    // Write the array elements to the file
+    fwrite(cpu.memory, sizeof(int), num_elements, file);
+
+    // Close the file
+    fclose(file);
+
+}
+
 int main(int argc, char const *argv[])
 {
 	// CPU_t cpu;
@@ -438,6 +457,8 @@ int main(int argc, char const *argv[])
     // printf("%s\n", argv[1]);
 
     readFile(argv[1]);
+
+    writeMemFile(argv[2]);
 
     printf("\n------ Registers ------\n");
 	print_registers(cpu.registers);
