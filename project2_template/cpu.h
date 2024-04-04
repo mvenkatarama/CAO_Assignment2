@@ -23,6 +23,7 @@ typedef struct CPU
     int stats[CPU_COUNTERS];
 
     // other informations needed to define here
+    int memory[MEM_SIZE];
 } CPU_t;
 
 #endif

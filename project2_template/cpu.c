@@ -25,13 +25,12 @@ int readFile(const char *filePath) {
     while (fread(instructionBuffer, 1, 1, binaryFile) == 1 && flag==1) {
         // printf("\nRead Instruction %d: 0x%02X", i, instructionBuffer[0]);
         int number_of_operands = 0;
-        cpu.stats[9]+=1;
+        cpu.stats[16]+=1;
+        cpu.stats[15]+=1;
 	// printf("\n%d", instructionBuffer[0]);
         switch (instructionBuffer[0])
         {
         case 0x01:
-            // printf(" - Set");
-
             fread(instructionBuffer, 1, 1, binaryFile);
             // printf("R%d = ",instructionBuffer[0]);
             rx = instructionBuffer[0];
@@ -44,14 +43,15 @@ int readFile(const char *filePath) {
             imm_value1 = second_byte;
 
             // printf("%d",imm_value1);
+            // printf("\n%d - Set: rx:%d, imm_value1:%d", cpu.stats[16], rx, imm_value1);
 
             cpu.registers[rx] = imm_value1;
             cpu.stats[0]+=1;
-            cpu.stats[6]+=1;
+            cpu.stats[12]+=1;
             break;
 
         case 0x10:
-            // printf(" - Add 1");
+            // printf("\n%d - Add 1", cpu.stats[16]);
             fread(instructionBuffer, 1, 1, binaryFile);
             rx = instructionBuffer[0];
             fread(instructionBuffer, 1, 1, binaryFile);
@@ -61,11 +61,11 @@ int readFile(const char *filePath) {
             cpu.registers[rx] = cpu.registers[ry] + cpu.registers[rz];
             // printf("R%d = %d", rx, cpu.registers[rx]);
             cpu.stats[1]+=1;
-            cpu.stats[6]+=1;
+            cpu.stats[12]+=1;
             break;
 
         case 0x50:
-            // printf(" - Add 2");
+            // printf("\n%d - Add 2", cpu.stats[16]);
             fread(instructionBuffer, 1, 1, binaryFile);
             rx = instructionBuffer[0];
             fread(instructionBuffer, 1, 1, binaryFile);
@@ -81,11 +81,11 @@ int readFile(const char *filePath) {
             cpu.registers[rx] = cpu.registers[ry] + imm_value1;
             // printf("R%d = %d", rx, cpu.registers[rx]);
             cpu.stats[1]+=1;
-            cpu.stats[7]+=1;
+            cpu.stats[13]+=1;
             break;
 
         case 0x90:
-            // printf(" - Add 3");
+            // printf("\n%d - Add 3",cpu.stats[16]);
             fread(instructionBuffer, 1, 1, binaryFile);
             rx = instructionBuffer[0];
 
@@ -106,11 +106,11 @@ int readFile(const char *filePath) {
             cpu.registers[rx] = imm_value1 + imm_value2;
             // printf("R%d = %d", rx, cpu.registers[rx]);
             cpu.stats[1]+=1;
-            cpu.stats[8]+=1;
+            cpu.stats[14]+=1;
             break;
 
         case 0x14:
-            // printf(" - Sub 1");
+            // printf("\n%d - Sub 1", cpu.stats[16]);
             fread(instructionBuffer, 1, 1, binaryFile);
             rx = instructionBuffer[0];
             fread(instructionBuffer, 1, 1, binaryFile);
@@ -120,11 +120,11 @@ int readFile(const char *filePath) {
             cpu.registers[rx] = cpu.registers[ry] - cpu.registers[rz];
             // printf("R%d = %d", rx, cpu.registers[rx]);
             cpu.stats[2]+=1;
-            cpu.stats[6]+=1;
+            cpu.stats[12]+=1;
             break;
 
         case 0x54:
-            // printf(" - Sub 2");
+            // printf("\n%d - Sub 2",cpu.stats[16]);
             fread(instructionBuffer, 1, 1, binaryFile);
             rx = instructionBuffer[0];
             fread(instructionBuffer, 1, 1, binaryFile);
@@ -140,11 +140,11 @@ int readFile(const char *filePath) {
             cpu.registers[rx] = cpu.registers[ry] - imm_value1;
             // printf("R%d = %d", rx, cpu.registers[rx]);
             cpu.stats[2]+=1;
-            cpu.stats[7]+=1;
+            cpu.stats[13]+=1;
             break;
 
         case 0x94:
-            // printf(" - Sub 3");
+            // printf("\n%d - Sub 3", cpu.stats[16]);
             fread(instructionBuffer, 1, 1, binaryFile);
             rx = instructionBuffer[0];
 
@@ -165,11 +165,11 @@ int readFile(const char *filePath) {
             cpu.registers[rx] = imm_value1 - imm_value2;
             // printf("R%d = %d", rx, cpu.registers[rx]);
             cpu.stats[2]+=1;
-            cpu.stats[8]+=1;
+            cpu.stats[14]+=1;
             break;
 
         case 0x18:
-            // printf(" - Mul 1");
+            // printf("\n%d - Mul 1",cpu.stats[16]);
             fread(instructionBuffer, 1, 1, binaryFile);
             rx = instructionBuffer[0];
             fread(instructionBuffer, 1, 1, binaryFile);
@@ -179,11 +179,11 @@ int readFile(const char *filePath) {
             cpu.registers[rx] = cpu.registers[ry] * cpu.registers[rz];
             // printf("R%d = %d", rx, cpu.registers[rx]);
             cpu.stats[3]+=1;
-            cpu.stats[6]+=1;
+            cpu.stats[12]+=1;
             break;
 
         case 0x58:
-            // printf(" - Mul 2");
+            // printf("\n%d - Mul 2", cpu.stats[16]);
             fread(instructionBuffer, 1, 1, binaryFile);
             rx = instructionBuffer[0];
             fread(instructionBuffer, 1, 1, binaryFile);
@@ -199,11 +199,11 @@ int readFile(const char *filePath) {
             cpu.registers[rx] = cpu.registers[ry] * imm_value1;
             // printf("R%d = %d", rx, cpu.registers[rx]);
             cpu.stats[3]+=1;
-            cpu.stats[7]+=1;
+            cpu.stats[13]+=1;
             break;
         
         case 0x98:
-            // printf(" - Mul 3");
+            // printf("\n%d - Mul 3", cpu.stats[16]);
             fread(instructionBuffer, 1, 1, binaryFile);
             rx = instructionBuffer[0];
 
@@ -224,11 +224,11 @@ int readFile(const char *filePath) {
             cpu.registers[rx] = imm_value1 * imm_value2;
             // printf("R%d = %d", rx, cpu.registers[rx]);
             cpu.stats[3]+=1;
-            cpu.stats[8]+=1;
+            cpu.stats[14]+=1;
             break;
 
         case 0x1C:
-            // printf(" - Div 1");
+            // printf("\n%d - Div 1", cpu.stats[16]);
             fread(instructionBuffer, 1, 1, binaryFile);
             rx = instructionBuffer[0];
             fread(instructionBuffer, 1, 1, binaryFile);
@@ -238,11 +238,11 @@ int readFile(const char *filePath) {
             cpu.registers[rx] = cpu.registers[ry] / cpu.registers[rz];
             // printf("R%d = %d", rx, cpu.registers[rx]);
             cpu.stats[4]+=1;
-            cpu.stats[6]+=1;
+            cpu.stats[12]+=1;
             break;
 
         case 0x5C:
-            // printf(" - Div 2");
+            // printf("\n%d - Div 2", cpu.stats[16]);
             fread(instructionBuffer, 1, 1, binaryFile);
             rx = instructionBuffer[0];
             fread(instructionBuffer, 1, 1, binaryFile);
@@ -258,11 +258,11 @@ int readFile(const char *filePath) {
             cpu.registers[rx] = cpu.registers[ry] / imm_value1;
             // printf("R%d = %d", rx, cpu.registers[rx]);
             cpu.stats[4]+=1;
-            cpu.stats[7]+=1;
+            cpu.stats[13]+=1;
             break;
         
         case 0x9C:
-            // printf(" - Div 3");
+            // printf("\n%d - Div 3", cpu.stats[16]);
             fread(instructionBuffer, 1, 1, binaryFile);
             rx = instructionBuffer[0];
 
@@ -283,21 +283,129 @@ int readFile(const char *filePath) {
             cpu.registers[rx] = imm_value1 / imm_value2;
             // printf("R%d = %d", rx, cpu.registers[rx]);
             cpu.stats[4]+=1;
-            cpu.stats[8]+=1;
+            cpu.stats[14]+=1;
             break;
+
+        // BEZ
+        case 0x04:
+            fread(instructionBuffer, 1, 1, binaryFile);
+            rx = instructionBuffer[0];
+
+            fread(instructionBuffer, 1, 1, binaryFile);
+            first_byte = instructionBuffer[0];
+            second_byte = first_byte << 8;
+            fread(instructionBuffer, 1, 1, binaryFile);
+            second_byte += instructionBuffer[0];
+            imm_value1 = second_byte;
+
+            // printf("\nBEZ: rx: %d, imm_value1:%d", rx, imm_value1);
+            if(cpu.registers[rx]==0) {
+                fseek(binaryFile, imm_value1, SEEK_SET);
+                // printf("\nBEZ-after seek");
+            }
+
+            cpu.stats[7]+=1;
+            cpu.stats[12]+=1;
+
+            break;
+        
+        // BGTZ
+        case 0x05:
+            fread(instructionBuffer, 1, 1, binaryFile);
+            rx = instructionBuffer[0];
+
+            fread(instructionBuffer, 1, 1, binaryFile);
+            first_byte = instructionBuffer[0];
+            second_byte = first_byte << 8;
+            fread(instructionBuffer, 1, 1, binaryFile);
+            second_byte += instructionBuffer[0];
+            imm_value1 = second_byte;
+
+            // printf("\nBGTZ: rx: %d, imm_value1:%d", rx, imm_value1);
+            if(cpu.registers[rx]>0){
+                long seek_pos = ftell(binaryFile);
+                // printf("BGTZ-Before seek position:%ld\t", seek_pos);
+                fseek(binaryFile, imm_value1, SEEK_SET);
+                seek_pos = ftell(binaryFile);
+                // printf("BGTZ-After seek position:%ld\t", seek_pos);
+            } 
+
+            cpu.stats[8]+=1;
+            cpu.stats[12]+=1;
+
+            break;
+
+        // BLTZ
+        case 0x06:
+            fread(instructionBuffer, 1, 1, binaryFile);
+            rx = instructionBuffer[0];
+
+            fread(instructionBuffer, 1, 1, binaryFile);
+            first_byte = instructionBuffer[0];
+            second_byte = first_byte << 8;
+            fread(instructionBuffer, 1, 1, binaryFile);
+            second_byte += instructionBuffer[0];
+            imm_value1 = second_byte;
+
+            // printf("\nBLTZ: rx: %d, imm_value1:%d", rx, imm_value1);
+            if(cpu.registers[rx]<0){
+                long seek_pos = ftell(binaryFile);
+                // printf("BLTZ-Before seek position:%ld\t", seek_pos);
+                fseek(binaryFile, imm_value1, SEEK_SET);
+                seek_pos = ftell(binaryFile);
+                // printf("BLTZ-After seek position:%ld\t", seek_pos);
+            } 
+
+            cpu.stats[9]+=1;
+            cpu.stats[12]+=1;
+
+            break;
+
+        // LD
+        case 0xC8:
+            fread(instructionBuffer, 1, 1, binaryFile);
+            rx = instructionBuffer[0];
+            fread(instructionBuffer, 1, 1, binaryFile);
+            ry = instructionBuffer[0];
+
+            // printf("\nLD: rx: %d, ry:%d", rx, ry);
+            cpu.registers[rx] = cpu.memory[cpu.registers[ry]];
+
+            cpu.stats[5]+=1;
+            cpu.stats[11]+=1;
+            break;
+
+        // SD
+        case 0xCC:
+            fread(instructionBuffer, 1, 1, binaryFile);
+            rx = instructionBuffer[0];
+            fread(instructionBuffer, 1, 1, binaryFile);
+            ry = instructionBuffer[0];
+
+            // printf("\nSD: rx: %d, ry:%d", rx, ry);
+            cpu.memory[cpu.registers[ry]] = cpu.registers[rx];
+
+            cpu.stats[6]+=1;
+            cpu.stats[11]+=1;
+            break;
+
 
         case 0x00:
             // printf(" - Ret");
-            cpu.stats[5]+=1;
-            cpu.stats[6]+=1;
+            cpu.stats[10]+=1;
+            cpu.stats[12]+=1;
             flag = 0;
             break;
         
         default:
+            // printf("\nInvalid @ %ld",ftell(binaryFile));
             break;
         }
         
         iteration-=1;
+        // long pos = ftell(binaryFile);
+        // printf(" POS : %ld\n", pos);
+        // print_registers(cpu.registers);
     }
 
     // Close the file when done
@@ -318,6 +426,11 @@ int main(int argc, char const *argv[])
 	// initialize stats
     for (int i = 0; i < CPU_COUNTERS; ++i) {
         cpu.stats[i] = 0;
+    }
+
+    // initialize memory
+    for(int i=0; i<MEM_SIZE; i++) {
+        cpu.memory[i] = 0;
     }
 
     // printf("%d\n", argc);
@@ -346,7 +459,7 @@ int main(int argc, char const *argv[])
  * Note : You are NOT supposed to edit this function
  */
 void print_statistics(int stats[]) {
-    printf("\n------ CPU Stats ------\n");
+    printf("\n------ Results ------\n");
 
     printf("Number of Set instructions: %d\n", stats[0]);
     printf("Number of Add instructions: %d\n", stats[1]);
@@ -386,4 +499,9 @@ void print_registers(int* registers) {
 //  ./cpu
 
 // make
-// ./sim mem1.in
+/*
+./sim mem1.in 
+/home/mvenkatarama/Documents/CAO/Projects/Proj2/CAO_Assignment2/project2_outputs/sample_mem1.out 
+> /home/mvenkatarama/Documents/CAO/Projects/Proj2/CAO_Assignment2/project2_template/output_1.txt
+
+*/
