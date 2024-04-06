@@ -10,7 +10,6 @@ int readFile(const char *filePath) {
     unsigned int instructionBuffer[1];
     instructionBuffer[0] = 0;
 
-    // printf("FilePath : %s", filePath);
     binaryFile = fopen(filePath, "rb");
 
     if (binaryFile == NULL) {
@@ -28,17 +27,12 @@ int readFile(const char *filePath) {
         cpu.stats[16]+=1;
         cpu.stats[15]+=1;
         int pc = (int) ftell(binaryFile);
-        // if(pc >= 130 && pc<=300) {
-        //     printf("\nInstruction : %d, pc: %d",instructionBuffer[0], pc-1);
-        // }
-	// printf("\n%d", instructionBuffer[0]);
         switch (instructionBuffer[0])
         {
         
         // set - 4B
         case 0x01:
             fread(instructionBuffer, 1, 1, binaryFile);
-            // printf("R%d = ",instructionBuffer[0]);
             rx = instructionBuffer[0];
 
             fread(instructionBuffer, 1, 1, binaryFile);
@@ -48,23 +42,10 @@ int readFile(const char *filePath) {
             second_byte += instructionBuffer[0];
             imm_value1 = second_byte;
 
-            // printf("%d",imm_value1);
-            // printf("\n%d - Set: rx:%d, imm_value1:%d", cpu.stats[16], rx, imm_value1);
-
             cpu.registers[rx] = imm_value1;
             cpu.stats[0]+=1;
             cpu.stats[12]+=1;
 
-            // int final_bytes = (0x01 << (3*8)) | (rx << (2*8)) |imm_value1;
-            // int final_bytes = (0x01  << (3*8)) | (rx << (2*8)) | (first_byte << (1*8) | (second_byte));
-            // cpu.memory[pc-1] = final_bytes;
-
-            cpu.memout[pc-1] = 0x01;
-            cpu.memout[pc] = rx;
-            cpu.memout[pc+1] = first_byte;
-            cpu.memout[pc+2] = second_byte;
-
-            // printf(" final bytes: %d", final_bytes);
             break;
 
         // add 4B
@@ -77,14 +58,10 @@ int readFile(const char *filePath) {
             fread(instructionBuffer, 1, 1, binaryFile);
             rz = instructionBuffer[0];
             cpu.registers[rx] = cpu.registers[ry] + cpu.registers[rz];
-            // printf("R%d = %d", rx, cpu.registers[rx]);
+
             cpu.stats[1]+=1;
             cpu.stats[12]+=1;
 
-            cpu.memout[pc-1] = 0x10;
-            cpu.memout[pc] = rx;
-            cpu.memout[pc+1] = ry;
-            cpu.memout[pc+2] = rz;
             break;
 
         // add 5B
@@ -103,15 +80,9 @@ int readFile(const char *filePath) {
             imm_value1 = second_byte;
 
             cpu.registers[rx] = cpu.registers[ry] + imm_value1;
-            // printf("R%d = %d", rx, cpu.registers[rx]);
             cpu.stats[1]+=1;
             cpu.stats[13]+=1;
 
-            cpu.memout[pc-1] = 0x50;
-            cpu.memout[pc] = rx;
-            cpu.memout[pc+1] = ry;
-            cpu.memout[pc+2] = imm_value1 >> 8;
-            cpu.memout[pc+3] = imm_value1;
             break;
 
         // add 6B
@@ -135,16 +106,9 @@ int readFile(const char *filePath) {
             imm_value2 = second_byte;
 
             cpu.registers[rx] = imm_value1 + imm_value2;
-            // printf("R%d = %d", rx, cpu.registers[rx]);
             cpu.stats[1]+=1;
             cpu.stats[14]+=1;
 
-            cpu.memout[pc-1] = 0x90;
-            cpu.memout[pc] = rx;
-            cpu.memout[pc+1] = imm_value1 >> 8;
-            cpu.memout[pc+2] = imm_value1;
-            cpu.memout[pc+3] = imm_value2 >> 8;
-            cpu.memout[pc+4] = imm_value2;
             break;
 
         // sub 4B
@@ -157,15 +121,8 @@ int readFile(const char *filePath) {
             fread(instructionBuffer, 1, 1, binaryFile);
             rz = instructionBuffer[0];
             cpu.registers[rx] = cpu.registers[ry] - cpu.registers[rz];
-            // printf("R%d = %d", rx, cpu.registers[rx]);
             cpu.stats[2]+=1;
             cpu.stats[12]+=1;
-
-            cpu.memout[pc-1] = 0x14;
-            cpu.memout[pc] = rx;
-            cpu.memout[pc+1] = ry;
-            cpu.memout[pc+2] = rz;
-
             break;
 
         // sub 5B
@@ -184,15 +141,8 @@ int readFile(const char *filePath) {
             imm_value1 = second_byte;
 
             cpu.registers[rx] = cpu.registers[ry] - imm_value1;
-            // printf("R%d = %d", rx, cpu.registers[rx]);
             cpu.stats[2]+=1;
             cpu.stats[13]+=1;
-
-            cpu.memout[pc-1] = 0x54;
-            cpu.memout[pc] = rx;
-            cpu.memout[pc+1] = ry;
-            cpu.memout[pc+2] = imm_value1 >> 8;
-            cpu.memout[pc+3] = imm_value1;
             break;
 
         // sub 6B
@@ -216,16 +166,9 @@ int readFile(const char *filePath) {
             imm_value2 = second_byte;
 
             cpu.registers[rx] = imm_value1 - imm_value2;
-            // printf("R%d = %d", rx, cpu.registers[rx]);
             cpu.stats[2]+=1;
             cpu.stats[14]+=1;
 
-            cpu.memout[pc-1] = 0x94;
-            cpu.memout[pc] = rx;
-            cpu.memout[pc+1] = imm_value1 >> 8;
-            cpu.memout[pc+2] = imm_value1;
-            cpu.memout[pc+3] = imm_value2 >> 8;
-            cpu.memout[pc+4] = imm_value2;
             break;
 
         // mul 4B
@@ -238,14 +181,10 @@ int readFile(const char *filePath) {
             fread(instructionBuffer, 1, 1, binaryFile);
             rz = instructionBuffer[0];
             cpu.registers[rx] = cpu.registers[ry] * cpu.registers[rz];
-            // printf("R%d = %d", rx, cpu.registers[rx]);
+
             cpu.stats[3]+=1;
             cpu.stats[12]+=1;
 
-            cpu.memout[pc-1] = 0x18;
-            cpu.memout[pc] = rx;
-            cpu.memout[pc+1] = ry;
-            cpu.memout[pc+2] = rz;
             break;
 
         // mul 5B
@@ -264,15 +203,10 @@ int readFile(const char *filePath) {
             imm_value1 = second_byte;
 
             cpu.registers[rx] = cpu.registers[ry] * imm_value1;
-            // printf("R%d = %d", rx, cpu.registers[rx]);
+            
             cpu.stats[3]+=1;
             cpu.stats[13]+=1;
 
-            cpu.memout[pc-1] = 0x58;
-            cpu.memout[pc] = rx;
-            cpu.memout[pc+1] = ry;
-            cpu.memout[pc+2] = imm_value1 >> 8;
-            cpu.memout[pc+3] = imm_value1;
             break;
         
         // mul 6B
@@ -296,16 +230,10 @@ int readFile(const char *filePath) {
             imm_value2 = second_byte;
 
             cpu.registers[rx] = imm_value1 * imm_value2;
-            // printf("R%d = %d", rx, cpu.registers[rx]);
+
             cpu.stats[3]+=1;
             cpu.stats[14]+=1;
 
-            cpu.memout[pc-1] = 0x98;
-            cpu.memout[pc] = rx;
-            cpu.memout[pc+1] = imm_value1 >> 8;
-            cpu.memout[pc+2] = imm_value1;
-            cpu.memout[pc+3] = imm_value2 >> 8;
-            cpu.memout[pc+4] = imm_value2;
             break;
 
         // div 4B
@@ -317,15 +245,12 @@ int readFile(const char *filePath) {
             ry = instructionBuffer[0];
             fread(instructionBuffer, 1, 1, binaryFile);
             rz = instructionBuffer[0];
+
             cpu.registers[rx] = cpu.registers[ry] / cpu.registers[rz];
-            // printf("R%d = %d", rx, cpu.registers[rx]);
+            
             cpu.stats[4]+=1;
             cpu.stats[12]+=1;
 
-            cpu.memout[pc-1] = 0x1C;
-            cpu.memout[pc] = rx;
-            cpu.memout[pc+1] = ry;
-            cpu.memout[pc+2] = rz;
             break;
 
         // div 5B
@@ -344,15 +269,10 @@ int readFile(const char *filePath) {
             imm_value1 = second_byte;
 
             cpu.registers[rx] = cpu.registers[ry] / imm_value1;
-            // printf("R%d = %d", rx, cpu.registers[rx]);
+
             cpu.stats[4]+=1;
             cpu.stats[13]+=1;
 
-            cpu.memout[pc-1] = 0x5C;
-            cpu.memout[pc] = rx;
-            cpu.memout[pc+1] = ry;
-            cpu.memout[pc+2] = imm_value1 >> 8;
-            cpu.memout[pc+3] = imm_value1;
             break;
         
         // div 6B
@@ -376,16 +296,9 @@ int readFile(const char *filePath) {
             imm_value2 = second_byte;
 
             cpu.registers[rx] = imm_value1 / imm_value2;
-            // printf("R%d = %d", rx, cpu.registers[rx]);
             cpu.stats[4]+=1;
             cpu.stats[14]+=1;
 
-            cpu.memout[pc-1] = 0x9C;
-            cpu.memout[pc] = rx;
-            cpu.memout[pc+1] = imm_value1 >> 8;
-            cpu.memout[pc+2] = imm_value1;
-            cpu.memout[pc+3] = imm_value2 >> 8;
-            cpu.memout[pc+4] = imm_value2;
             break;
 
         // BEZ - 4B
@@ -400,7 +313,6 @@ int readFile(const char *filePath) {
             second_byte += instructionBuffer[0];
             imm_value1 = second_byte;
 
-            // printf("\nBEZ: rx: %d, imm_value1:%d", rx, imm_value1);
             if(cpu.registers[rx]==0) {
                 fseek(binaryFile, imm_value1, SEEK_SET);
                 // long seek_pos = ftell(binaryFile);
@@ -411,11 +323,6 @@ int readFile(const char *filePath) {
 
             cpu.stats[7]+=1;
             cpu.stats[12]+=1;
-
-            cpu.memout[pc-1] = 0x04;
-            cpu.memout[pc] = rx;
-            cpu.memout[pc+1] = imm_value1 >> 8;
-            cpu.memout[pc+2] = imm_value1;
 
             break;
         
@@ -431,7 +338,6 @@ int readFile(const char *filePath) {
             second_byte += instructionBuffer[0];
             imm_value1 = second_byte;
 
-            // printf("\nBGTZ: rx: %d, imm_value1:%d", rx, imm_value1);
             if(cpu.registers[rx]>0){
                 // printf("BGTZ-Before seek position:%ld\t", seek_pos);
                 fseek(binaryFile, imm_value1, SEEK_SET);
@@ -442,11 +348,6 @@ int readFile(const char *filePath) {
 
             cpu.stats[8]+=1;
             cpu.stats[12]+=1;
-
-            cpu.memout[pc-1] = 0x05;
-            cpu.memout[pc] = rx;
-            cpu.memout[pc+1] = imm_value1 >> 8;
-            cpu.memout[pc+2] = imm_value1;
 
             break;
 
@@ -474,11 +375,6 @@ int readFile(const char *filePath) {
             cpu.stats[9]+=1;
             cpu.stats[12]+=1;
 
-            cpu.memout[pc-1] = 0x06;
-            cpu.memout[pc] = rx;
-            cpu.memout[pc+1] = imm_value1 >> 8;
-            cpu.memout[pc+2] = imm_value1;
-
             break;
 
         // LD - 3B
@@ -493,10 +389,7 @@ int readFile(const char *filePath) {
 
             cpu.stats[5]+=1;
             cpu.stats[11]+=1;
-
-            cpu.memout[pc-1] = 0xC8;
-            cpu.memout[pc] = rx;
-            cpu.memout[pc+1] = ry;          
+        
             break;
 
         // SD - 3B
@@ -509,12 +402,16 @@ int readFile(const char *filePath) {
             // printf("\nSD: rx: %d, ry:%d", rx, ry);
             cpu.memory[cpu.registers[ry]] = cpu.registers[rx];
 
+            int value = cpu.registers[rx];
+
+            cpu.memout[cpu.registers[ry]] = value;
+            cpu.memout[cpu.registers[ry]+1] = value >> 1*8;
+            cpu.memout[cpu.registers[ry]+2] = value >> 2*8;
+            cpu.memout[cpu.registers[ry]+3] = value >> 3*8;
+
             cpu.stats[6]+=1;
             cpu.stats[11]+=1;
 
-            cpu.memout[pc-1] = 0xCC;
-            cpu.memout[pc] = rx;
-            cpu.memout[pc+1] = ry;  
             break;
 
 
@@ -524,7 +421,6 @@ int readFile(const char *filePath) {
             cpu.stats[12]+=1;
             flag = 0;
 
-            cpu.memout[pc-1] = 0x00;
             break;
         
         default:
@@ -553,13 +449,9 @@ void writeMemFile(const char *filePath) {
     FILE *file = fopen(filePath, "wb");
     if (file == NULL) {
         perror("Error opening file");
+        fclose(file);
+        return;
     }
-
-    // for(int i=0; i< 2000; i++){
-    //     if(i >= 170 && i<= 300) {
-    //         printf("\nmemout[%d]:%x", i, cpu.memout[i]);
-    //     }    
-    // }
 
     // Write the array elements to the file
     fwrite(cpu.memout, sizeof(char), MEM_SIZE, file);
@@ -567,6 +459,33 @@ void writeMemFile(const char *filePath) {
     // Close the file
     fclose(file);
 
+}
+
+void loadMemFileIntoArr(const char *filePath){
+    FILE *file;
+    size_t bytes_read; 
+
+
+    file = fopen(filePath, "rb");
+    if (file == NULL) {
+        perror("Error opening file");
+        fclose(file);
+        return;
+    }
+
+
+    bytes_read = fread(cpu.memout, sizeof(char), sizeof(cpu.memout), file);
+    if (bytes_read == 0) {
+        perror("Error reading from file");
+        fclose(file);
+        return;
+    }
+
+    // Close the file
+    fclose(file);
+
+
+    return;
 }
 
 int main(int argc, char const *argv[])
@@ -592,13 +511,16 @@ int main(int argc, char const *argv[])
     // printf("%s\n", argv[0]);
     // printf("%s\n", argv[1]);
 
+    loadMemFileIntoArr(argv[1]);
+
     readFile(argv[1]);
 
     printf("\n------ Registers ------\n");
 	print_registers(cpu.registers);
 	print_statistics(cpu.stats);
 
-     writeMemFile(argv[2]);
+    writeMemFile(argv[2]);
+    // writeMemOutFile(argv[1], argv[2]);
 
 	// Step2: read bits from the text area of memory
 
