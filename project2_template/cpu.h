@@ -24,6 +24,9 @@ typedef struct CPU
 
     // other informations needed to define here
     int memory[MEM_SIZE];
+
+    // char array memout
+    char memout[MEM_SIZE];
 } CPU_t;
 
 #endif
